@@ -3,8 +3,8 @@ This module lets you practice the use of robot sensors.
 
 Authors: David Mutchler, Vibha Alangar, Matt Boutell, Dave Fisher,
          Mark Hays, Amanda Stouder, Aaron Wilkin, their colleagues,
-         and PUT_YOUR_NAME_HERE.
-"""  # TODO: 1. PUT YOUR NAME IN THE ABOVE LINE.
+         and Joshua Giambattista.
+"""  # Done: 1. PUT YOUR NAME IN THE ABOVE LINE.
 
 import ev3dev.ev3 as ev3
 import time
@@ -25,13 +25,13 @@ import math
 def main():
     """ Calls the testing functions. """
     # Un-comment out these tests as you implement the methods they test.
-    # run_test_beep_and_tone()
-    # run_test_go_straight_for_seconds()
+    #run_test_beep_and_tone()
+    #run_test_go_straight_for_seconds()
     # run_test_go_straight_for_inches_using_time()
-    # run_test_go_straight_for_inches_using_sensor()
+    #run_test_go_straight_for_inches_using_sensor()
     # run_test_raise_arm()
     # run_test_lower_arm()
-    # run_test_go_straight_until_black()
+    run_test_go_straight_until_black()
     # run_test_go_forward_until_distance_is_less_than()
     # run_test_tones_until_touch_sensor_is_pressed()
 
@@ -43,7 +43,7 @@ def run_test_beep_and_tone():
        -- tone method of the ToneMaker class
     """
     # -------------------------------------------------------------------------
-    # TODO: 4.  Implement and test this method.
+    # Done: 4.  Implement and test this method.
     # -------------------------------------------------------------------------
     # IMPORTANT:
     #   For testing the   beep   method,
@@ -57,7 +57,14 @@ def run_test_beep_and_tone():
     #   in increments of 10, with 50 millisecond durations.
     #   Do not forget to apply the   wait   method to tone, as usual.
     # -------------------------------------------------------------------------
-
+    b = Beeper()
+    t = ToneMaker()
+    for k in range(10):
+        b.beep()
+        b.beep().wait()
+    for j in range(100,201,10):
+        t.tone(j, 50)
+        t.tone(j, 50).wait()
 
 # -----------------------------------------------------------------------------
 # TODO 5:  With your instructor, do quiz questions XXX through XXX.
@@ -173,7 +180,7 @@ def run_test_go_straight_for_inches_using_sensor():
     drive_system.go_straight_for_inches_using_sensor(12, -50)
 
     # -------------------------------------------------------------------------
-    # TODO: 9.  With your instructor, implement the
+    # Done: 9.  With your instructor, implement the
     #      go_straight_for_inches_using_sensor    method of   DriveSystem.
     #      The tests are already written for you -- READ THEM (above).
     # -------------------------------------------------------------------------
@@ -277,8 +284,18 @@ def run_test_go_straight_until_black():
     print('Testing the   go_straight_until_black   method of DriveSystem:')
     print('--------------------------------------------------')
     # -------------------------------------------------------------------------
-    # TODO: 13. Implement this test method, then implement the method it tests.
+    # Done: 13. Implement this test method, then implement the method it tests.
     # -------------------------------------------------------------------------
+    drive_system = DriveSystem()
+    beeper = Beeper()
+
+    input('Press the ENTER key to continue.')
+    beeper.beep()
+    drive_system.go_straight_until_black(50)
+
+    input('Press the ENTER key to continue.')
+    beeper.beep()
+    drive_system.go_straight_for_inches_using_sensor(-50)
 
 
 def run_test_go_forward_until_distance_is_less_than():
@@ -339,7 +356,6 @@ class DriveSystem(object):
 
     def go_straight_for_seconds(self, seconds, speed):
         start = time.time()
-        self.go(speed, speed)
         # Note: using   time.sleep   to control the time to run is better.
         # We do it with a WHILE loop here for pedagogical reasons.
         while True:
@@ -355,7 +371,14 @@ class DriveSystem(object):
         self.go_straight_for_seconds(seconds, speed)
 
     def go_straight_for_inches_using_sensor(self, inches, speed):
-        pass
+
+        inches_per_degree = self.left_motor.WheelCircumference/360
+        self.left_motor.reset_position()
+        self.right_motor.reset_position()
+
+        while(abs(self.left_motor.get_position()) * inches_per_degree) <= inches:
+            self.go(speed, speed)
+        self.stop()
         # Live code this with students
 
     def go_straight_until_black(self, speed):
@@ -363,7 +386,11 @@ class DriveSystem(object):
         Goes straight at the given speed until the robot is over
         a black surface, as measured by the color sensor.
         """
-        pass
+
+        color = ColorSensor('3')
+        while color.get_reflected_light_intensity() <= 5:
+            self.go(speed, speed)
+        self.stop()
 
     def go_forward_until_distance_is_less_than(self, inches, speed):
         """
@@ -387,7 +414,8 @@ class DriveSystem(object):
 #   -- TouchSensor
 #   -- ColorSensor
 #   -- IR_DistanceSensor
-#   --
+#   -- Beeprer
+#   -- ToneMaker
 # USE them, but do NOT modify them.
 ###############################################################################
 class Motor(object):
